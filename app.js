@@ -12,6 +12,9 @@ app.use(express.json());
 app.use(cors("*"))
 
 
+app.get('/', (req, res)=> {
+    res.send('API IS RUNNING..')
+})
 
 app.use('/', authRouter)
 app.use('/event', eventRouter)

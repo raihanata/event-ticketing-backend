@@ -6,10 +6,10 @@ import jwt from 'jsonwebtoken';
 export const registration = async (req, res) => {
     try {
 
-        const { name, password, email, gender, phone, country } = req.body;
+        const {firstname,lastname,password, email, gender, phone, country } = req.body;
         console.log(req.body);
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newuser = new User({ name, password: hashedPassword, email, gender, phone, country })
+        const newuser = new User({ firstname, lastname,password: hashedPassword, email, gender, phone, country })
         await newuser.save();
         res.status(200).json({ message: 'User registered successfully' });
 
@@ -27,13 +27,13 @@ export const registration = async (req, res) => {
 export const login = async (req, res) => {
 
     try {
-        const { name, password } = req.body;
+        const { email, password } = req.body;
 
-        console.log(name);
+        console.log(email);
 
-        const userData = await User.findOne({ name });
+        const userData = await User.findOne({ email });
         console.log(userData);
-        res.send("success")
+     
         if (!userData) {
 
             return res.status(400).json({ error: 'Authentication failed' });
@@ -50,12 +50,8 @@ export const login = async (req, res) => {
         res.status(200).json({
             status: true,
             message: '',
-            data: {
-                token,
-                user: {
-                    email: userData.email
-                }
-            }
+            token,
+            data: userData
         });
     }
     catch (error) {
