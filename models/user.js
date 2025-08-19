@@ -31,7 +31,15 @@ const userSchema = new mongoose.Schema({
     },
     country: {
         type: String
-    }
+    },
+    otp: {
+        type: String,
+          default: 'null'
+    },
+    otpExpiry: {
+        type: Date,
+          default: 'null'
+    },
 
 },
     {
