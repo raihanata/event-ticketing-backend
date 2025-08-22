@@ -88,3 +88,50 @@ export const forgotpwdcheck = async (req, res) => {
         res.status(500).json({ error: 'serverfailed' });
     }
 }
+//verify otp for forgot password
+export const verifyOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        console.log(req.body);
+
+        const userOtp = await User.findOne({
+            email, otp, otpExpiry: { $gt: Date.now() }
+        });
+
+        if (!userOtp) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+        console.log(userOtp);
+
+        
+        res.json({ message: "OTP verified successfully" });
+
+    } catch (error) {
+
+    }
+}
+//reset password
+export const resetPassword = async (req, res) => {
+    try {
+
+        const { email, otp, newpassword } = req.body;
+        console.log(req.body);
+
+        const resetData = await User.findOne({ email, otp, otpExpiry: { $gt: Date.now() } });
+         console.log(resetData);
+         
+        if (!resetData) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+        resetData.password = newpassword;
+        resetData.otp = undefined;
+        resetData.otpExpiry = undefined;
+
+        await resetData.save();
+
+        res.json({ message: "Password reset successfully" });
+
+    } catch (error) {
+
+    }
+}
