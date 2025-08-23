@@ -103,11 +103,20 @@ export const verifyOtp = async (req, res) => {
         }
         console.log(userOtp);
 
-        
-        res.json({ message: "OTP verified successfully" });
+        const token = jwt.sign({ userId: userOtp._id }, process.env.JWT_TOKEN, {
+            expiresIn: "5m"  // short expiry for reset
+        });
+
+        console.log(token)
+        return res.status(200).json({
+            status: true,
+            message: "OTP verified successfully",
+            token
+        });
 
     } catch (error) {
-
+        console.log(error);
+        res.status(500).json({ error: 'serverfailed' });
     }
 }
 //reset password
@@ -118,8 +127,8 @@ export const resetPassword = async (req, res) => {
         console.log(req.body);
 
         const resetData = await User.findOne({ email, otp, otpExpiry: { $gt: Date.now() } });
-         console.log(resetData);
-         
+        console.log(resetData);
+
         if (!resetData) {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
@@ -129,7 +138,11 @@ export const resetPassword = async (req, res) => {
 
         await resetData.save();
 
-        res.json({ message: "Password reset successfully" });
+        res.json({
+            message: "Password reset successfully",
+            status: true,
+
+        });
 
     } catch (error) {
 

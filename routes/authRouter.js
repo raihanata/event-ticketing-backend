@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import  { forgotpwdcheck, login, registration, resetPassword, verifyOtp } from '../controllers/authController.js'
+import verifyToken from '../controllers/middleware/authmiddleware.js'
 
 
 
@@ -9,5 +10,6 @@ authRouter.post('/register',registration)
 authRouter.post('/login',login)
 authRouter.post('/checkuser',forgotpwdcheck)
 authRouter.post('/verifyotp',verifyOtp)
-authRouter.post('/resetpassword',resetPassword)
+authRouter.post('/resetpassword',verifyToken,resetPassword)
+
 export default authRouter
