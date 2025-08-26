@@ -121,30 +121,55 @@ export const verifyOtp = async (req, res) => {
 }
 //reset password
 export const resetPassword = async (req, res) => {
-    try {
+    // try {
 
-        const { email, otp, newpassword } = req.body;
-        console.log(req.body);
+    //     const {newpassword } = req.body;
+    //     console.log(req.body);
 
-        const resetData = await User.findOne({ email, otp, otpExpiry: { $gt: Date.now() } });
-        console.log(resetData);
+    //     const resetData = await User.findOne({ email, otp, otpExpiry: { $gt: Date.now() } });
+    //     console.log(resetData);
 
-        if (!resetData) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
-        }
-        resetData.password = newpassword;
-        resetData.otp = undefined;
-        resetData.otpExpiry = undefined;
+    //     if (!resetData) {
+    //         return res.status(400).json({ message: "Invalid or expired OTP" });
+    //     }
+    //     resetData.password = newpassword;
+    //     resetData.otp = undefined;
+    //     resetData.otpExpiry = undefined;
 
-        await resetData.save();
+    //     await resetData.save();
 
-        res.json({
-            message: "Password reset successfully",
-            status: true,
+    //     res.json({
+    //         message: "Password reset successfully",
+    //         status: true,
             
-        });
+    //     });
 
-    } catch (error) {
+    // } catch (error) {
 
+    // }
+
+    try {
+    const userId = req.userId; // decoded from JWT in middleware
+    const { newpassword } = req.body;
+     console.log(newpassword);
+     
+    if (!newpassword) {
+      return res.status(400).json({ message: "New password is required" });
     }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newpassword, 10);
+    user.password = hashedPassword;
+    user.otp = null;
+    user.otpExpiry = null;
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 }
