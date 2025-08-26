@@ -4,6 +4,7 @@ import mongoose  from "mongoose";
 import dotEnv from 'dotenv'
 import authRouter from "./routes/authRouter.js";
 import eventRouter from "./routes/eventRouter.js";
+import contactRouter from "./routes/contactRouter.js";
 
 dotEnv.config()
 
@@ -18,6 +19,7 @@ app.get('/', (req, res)=> {
 
 app.use('/', authRouter)
 app.use('/event', eventRouter)
+app.use('/contact', contactRouter)
 
 mongoose.connect(process.env.MONGO_URI).then(()=>{
     console.log("database connected");
