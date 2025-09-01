@@ -5,9 +5,9 @@ import Event from '../models/event.js'
 export const eventCreate = async (req, res) => {
     try {
 
-        const { title, description, date, time, location, price, totalTickets, availableTickets } = req.body
+        const { title, description, date, time, location, price, totalTickets, availableTickets,ticketTypes } = req.body
         console.log(req.body);
-        const newevent = new Event({ title, description, date, time, location, price, totalTickets, availableTickets })
+        const newevent = new Event({ title, description, date: { from: new Date(date.from), to: new Date(date.to)}, time, location, price, totalTickets, availableTickets,ticketTypes })
         await newevent.save()
         res.status(200).json({ message: 'event registered successfully' });
     }
@@ -44,10 +44,11 @@ export const viewEvent = async (req, res) => {
 export const upadateEvent = async (req, res) => {
     try {
 
-        const { title, description, price, _id } = req.body;
+        const { eventData, _id } = req.body;
+        
         console.log(req.body);
 
-        const updateData = await Event.findByIdAndUpdate(_id, { title, description, price }, { new: true })
+        const updateData = await Event.findByIdAndUpdate(_id,eventData, { new: true })
 
         if (updateData) {
             res.status(200).json({ message: 'event updated successfully' });

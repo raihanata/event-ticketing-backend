@@ -30,23 +30,21 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price:
+    ticketTypes: [
     {
-        type: Number,
-        required: true
+      name: {
+        type: String,
+        enum: ["VIP", "VVIP", "Regular", "Silver", "Gold"], 
+        required: true,
+      },
+      price: { type: Number, required: true },
+      totalTickets: { type: Number, required: true },
+      availableTickets: { type: Number, required: true },
     },
-    totalTickets:
-    {
-        type: Number,
-        required: true
-    },
-    availableTickets:
-    {
-        type: Number,
-        required: true
-    },
+  ],
 
-})
+},
+ { timestamps: true })
 
 const eventmodel = mongoose.model('Event', eventSchema)
 export default eventmodel
