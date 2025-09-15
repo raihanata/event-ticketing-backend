@@ -1,13 +1,41 @@
+import mongoose from 'mongoose';
 import Event from '../models/event.js'
 
 
 
 export const eventCreate = async (req, res) => {
+    let ticketTypeEntries = [
+        { name: "VIP", price: 0, totalTickets: 0, availableTickets: 0 },
+        { name: "VVIP", price: 0, totalTickets: 0, availableTickets: 0 },
+        { name: "Regular", price: 0, totalTickets: 0, availableTickets: 0 },
+        { name: "Silver", price: 0, totalTickets: 0, availableTickets: 0 },
+        { name: "Gold", price: 0, totalTickets: 0, availableTickets: 0 },
+    ];
     try {
 
-        const { title, description, date, time, location, price, totalTickets, availableTickets,ticketTypes } = req.body
-        console.log(req.body);
-        const newevent = new Event({ title, description, date: { from: new Date(date.from), to: new Date(date.to)}, time, location, price, totalTickets, availableTickets,ticketTypes })
+        console.log(req.file, 'uploaded')
+        console.log('pathname : ', `localhost:8000/uploads/${req.file.originalname}`)
+        const { title, description, date, time, location, ticketTypes } = req.body
+        console.log('req', req.body);
+        ticketTypes.map(item => {
+            const eventIndex = ticketTypeEntries.findIndex(event => event.name === item.name)
+            ticketTypeEntries[eventIndex] = item
+            console.log(eventIndex, 'event index')
+        })
+
+        console.log(ticketTypeEntries, 'ticket type entries')
+        console.log(ticketTypes, 'ticket types')
+        const eventData = {
+            image:`http://localhost:8000/uploads/${req.file.originalname}`,
+            title,
+            description,
+            date: { from: new Date(date.from), to: new Date(date.to) },
+            time,
+            location,
+            ticketTypes
+        }
+
+        const newevent = new Event(eventData)
         await newevent.save()
         res.status(200).json({ message: 'event registered successfully' });
     }
@@ -27,11 +55,16 @@ export const viewEvent = async (req, res) => {
 
         const eventData = await Event.find();
         console.log(eventData);
-        res.send(eventData)
+
 
         if (eventData) {
 
-            return res.status(200).json({ message: 'success' });
+            res.status(200).json({
+                status: true,
+                data: eventData,
+                message: ''
+
+            })
         }
 
     } catch (error) {
@@ -43,14 +76,37 @@ export const viewEvent = async (req, res) => {
 //upadte event
 export const upadateEvent = async (req, res) => {
     try {
+        const { _id, eventData, } = req.body;
+        const { ticketTypes, ...eventDataUpdates } = eventData
 
-        const { eventData, _id } = req.body;
-        
-        console.log(req.body);
+        let updateData = await Event.findByIdAndUpdate(_id, eventDataUpdates, { new: true }).exec()
 
-        const updateData = await Event.findByIdAndUpdate(_id,eventData, { new: true })
+
+        if (ticketTypes && ticketTypes.length > 0) {
+
+            for (let i of ticketTypes) {
+                console.log(ticketTypes)
+                const result = await Event.updateOne({ _id, "ticketTypes.name": i.name }, {
+                    "ticketTypes.$.name": i.name,
+                    "ticketTypes.$.price": i.price,
+                    "ticketTypes.$.totalTickets": i.totalTickets,
+                    "ticketTypes.$.availableTickets": i.availableTickets
+                })
+
+
+                if (result.matchedCount === 0) {
+                    await Event.updateOne(
+                        { _id },
+                        { $push: { ticketTypes: i } }
+                    );
+                }
+
+            }
+        }
+
 
         if (updateData) {
+
             res.status(200).json({ message: 'event updated successfully' });
         } else {
 
@@ -60,7 +116,7 @@ export const upadateEvent = async (req, res) => {
     } catch (error) {
         console.log(error);
 
-        res.status(400).json({ error: 'event updation failed' });
+        res.status(500).json({ error: 'event updation failed', debug: error });
     }
 }
 //delete event
