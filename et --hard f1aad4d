@@ -1,0 +1,16 @@
+[33md863022[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m progress
+[33m62b13af[m progress
+[33m7b802c6[m progress
+[33mf1aad4d[m[33m ([m[1;31morigin/main[m[33m)[m removed files
+[33m156bbc4[m progress: working on cart page
+[33m53a40bc[m contact message complted
+[33m5f0130a[m fix: lowercase middleware file for Render
+[33ma7a1e78[m password hashing
+[33md7dd87b[m pasword hashing
+[33m34c2dca[m auth routerl changes
+[33m16b9c72[m user model changes
+[33ma11dc45[m user model changes
+[33m578c72a[m otp verification
+[33m2302c03[m forgot password checking user exist
+[33mf08b42b[m refactor: update register module
+[33mf9ad861[m initial commit
